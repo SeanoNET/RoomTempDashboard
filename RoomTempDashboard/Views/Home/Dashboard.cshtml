@@ -1,0 +1,86 @@
+﻿@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<h2>Dashboard</h2>
+
+<div id="data">
+    <label>Refresh Rate:</label>
+    <select id="refreshRate">
+        <option value="1000">1 second</option>
+        <option value="5000">5 seconds</option>
+        <option value="30000">30 seconds</option>
+        <option selected value="60000">1 minute</option>
+    </select>
+    < br />
+    <label id="temp"></label>
+    <br />
+    <label id="humidity"></label>
+</div>
+
+<script src="~/lib/signalr/dist/browser/signalr.js"></script>
+<script>
+
+    // Connect to the SignalR hub
+    var connection = new signalR.HubConnectionBuilder().withUrl("/dataHub").build();
+
+            connection.on("GetCurrentValues", function (json) {
+                var data = JSON.parse(json);
+
+
+                document.getElementById("temp").innerText = `${parseFloat(data.Temperature).toFixed(2)} C`;
+                document.getElementById("humidity").innerText = `${parseFloat(data.Humidity).toFixed(2)} %`;
+            });
+
+
+            // Connect to hub after page load
+            //window.addEventListener('load', function () {
+            //    connection.start().then(function () {
+            //        connection.invoke("GetCurrentValues").catch((err) => { console.error(err); });
+            //    }).catch((err) => { return console.error(err); });
+            //});
+
+            // Restart connection when refresh rate changes TODO: find a better way?
+            document.getElementById("refreshRate").addEventListener('change', (event) => {
+                var s = document.getElementById("refreshRate");
+                var rate = s.options[s.selectedIndex].value;
+
+                if (connection.state === 0) {
+                    connection.start().then(function () {
+                        createOrChangePing(rate);
+                    }).catch((err) => { return console.error(err); });
+                }
+                else {
+                    createOrChangePing(rate);
+                }
+            });
+
+
+            var totalRunningPings = 0;
+            var ping = null;
+            var currentRate = 0;
+
+            // Restarts or starts get data refresh
+            function createOrChangePing(rate) {
+                
+                if(totalRunningPings != 0)
+                    stopPing();
+
+                totalRunningPings++;
+                // Does not like parsing rate?
+                //ping = setInterval(getData(rate), rate);
+                currentRate = rate;
+                ping = setInterval(getData, rate);
+            }
+
+            function stopPing() {
+                clearInterval(ping);
+                totalRunningPings--;
+                console.log("Stopped ping");
+            }
+
+            function getData() {
+                console.log(`Call GetCurrentValues every ${currentRate}ms - total running: ${totalRunningPings}`);
+                connection.invoke("GetCurrentValues").catch((err) => { console.error(err); });
+            }
+</script>
