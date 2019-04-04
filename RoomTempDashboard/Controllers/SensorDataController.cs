@@ -21,6 +21,7 @@ namespace RoomTempDashboard.Controllers
         // GET: SensorData
         public async Task<IActionResult> Index()
         {
+   
             return View(await _context.SensorData.ToListAsync());
         }
 

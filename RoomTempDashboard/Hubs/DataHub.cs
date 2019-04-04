@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using System;
+using Microsoft.EntityFrameworkCore;
 
 namespace RoomTempDashboard.Hubs
 {
@@ -32,6 +33,14 @@ namespace RoomTempDashboard.Hubs
 
             string json = JsonConvert.SerializeObject(sensorData); //@"{""temp"":""24"",""humidity"":""20""}";
             await Clients.All.SendAsync("GetCurrentValues", json);
+        }
+
+        public async Task GetLatestReading()
+        {
+            var sensorData = _context.SensorData.OrderByDescending(m => m.MeasuredAt).First();
+
+            string json = JsonConvert.SerializeObject(sensorData);
+            await Clients.All.SendAsync("GetLatestReading", json);
         }
 
     }

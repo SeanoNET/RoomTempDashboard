@@ -9,6 +9,23 @@
         "dist/browser/signalr.js",
         "dist/browser/signalr.min.js"
       ]
+    },
+    {
+      "provider": "cdnjs",
+      "library": "Chart.js@2.7.3",
+      "destination": "wwwroot/lib/Chartjs/",
+      "files": [
+        "Chart.min.js"
+      ]
+    },
+    {
+      "provider": "cdnjs",
+      "library": "moment.js@2.24.0",
+      "destination": "wwwroot/lib/moment.js/",
+      "files": [
+        "moment.min.js",
+        "moment.js"
+      ]
     }
   ]
 }

@@ -1,0 +1,151 @@
+﻿@{
+    ViewData["Title"] = "Timeline";
+}
+
+<canvas id="myChart" width="1200" height="500"></canvas>
+<script src="~/lib/moment.js/moment.js"></script>
+<script src="~/lib/signalr/dist/browser/signalr.js"></script>
+<script src="~/lib/Chartjs/Chart.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@0.7.0"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-streaming@latest/dist/chartjs-plugin-streaming.min.js"></script>
+<button id="reset">Reset Zoom</button>
+<div id="json">
+
+</div>
+<script>
+
+
+    // Connect to the SignalR hub
+    var connection = new signalR.HubConnectionBuilder().withUrl("/dataHub").build();
+
+    // Create chart
+    var ctx = document.getElementById('myChart').getContext('2d');
+    var chartConfig = {
+        type: 'line',
+        data: {
+            datasets: [{
+                borderColor: 'Blue',
+                label: 'Room',
+                fill: false,
+                data: []
+            }]
+        }, options: {
+            responsive: false,
+            title: {
+                display: true,
+                text: 'Sensor Readings'
+            },
+            tooltips: {
+                mode: 'index',
+                intersect: false,
+            },
+            hover: {
+                mode: 'nearest',
+                intersect: true
+            },
+            scales: {
+                xAxes: [{
+                    type: 'realtime',
+                    realtime: {
+                        delay: 2000
+                    }
+                }],
+                yAxes: [{
+                    display: true,
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'Temperature °C'
+                    }
+                }]
+            },
+            // Assume x axis is the realtime scale
+            pan: {
+                enabled: true,    // Enable panning
+                mode: 'x',        // Allow panning in the x direction
+                rangeMin: {
+                    x: null       // Min value of the delay option
+                },
+                rangeMax: {
+                    x: null       // Max value of the delay option
+                }
+            },
+            zoom: {
+                enabled: true,    // Enable zooming
+                mode: 'x',        // Allow zooming in the x direction
+                rangeMin: {
+                    x: null       // Min value of the duration option
+                },
+                rangeMax: {
+                    x: null       // Max value of the duration option
+                }
+            }
+        }
+    };
+
+    var chart = new Chart(ctx, chartConfig);
+
+    // SignalR events
+    connection.on("GetLatestReading", function (json) {
+        var data = JSON.parse(json);
+
+        // Using 'real date  time' causes issues with the delay of the realtime graph.
+        var MeasuredAt_EPOCH = convertUTCDateToLocalDate(new Date(data.MeasuredAt));
+        MeasuredAt_EPOCH = MeasuredAt_EPOCH.getTime();
+
+        chart.data.datasets[0].data.push({
+            //x: MeasuredAt_EPOCH,
+            x: Date.now(),
+            y: data.Temperature
+        });
+
+        chart.update({
+            preservation: true
+        });
+
+        document.getElementById("json").innerText = JSON.stringify(data);
+    });
+
+
+    // Date Util
+    function convertUTCDateToLocalDate(date) {
+        var newDate = new Date(date.getTime() + date.getTimezoneOffset() * 60 * 1000);
+
+        var offset = date.getTimezoneOffset() / 60;
+        var hours = date.getHours();
+
+        newDate.setHours(hours - offset);
+
+        return newDate;
+    }
+
+    // Connect to hub on load
+    $(document).ready(function () {
+        // Start SignalR connection
+        connection.start().then(function () {
+             createOrChangePing();
+        }).catch((err) => { return console.error(err); });
+
+    });
+
+
+    var ping = null;
+
+    // Restarts or starts get data refresh
+    function createOrChangePing() {
+        var currentRate = 1000;
+        getData(currentRate);
+        ping = setInterval(getData, currentRate, currentRate);
+    }
+
+    function getData(currentRate) {
+        console.log(`Call GetLatestReading every ${currentRate}ms`);
+        connection.invoke("GetLatestReading").catch((err) => { console.error(err); });
+    }
+
+    // Reset Zoom
+    document.getElementById('reset').addEventListener('click', () => {
+        chart.resetZoom();
+    });
+
+</script>
