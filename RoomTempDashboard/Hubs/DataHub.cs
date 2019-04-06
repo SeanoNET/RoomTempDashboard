@@ -39,6 +39,15 @@ namespace RoomTempDashboard.Hubs
         {
             var sensorData = _context.SensorData.OrderByDescending(m => m.MeasuredAt).First();
 
+            // For testing differences with no device active
+            Random r = new Random();
+            int range = 3;
+            decimal rTemp = Convert.ToDecimal(r.NextDouble() * range);
+            decimal rHum = Convert.ToDecimal(r.NextDouble() * (range / 2));
+
+            sensorData.Humidity = sensorData.Humidity + rHum;
+            sensorData.Temperature = sensorData.Temperature + rTemp;
+
             string json = JsonConvert.SerializeObject(sensorData);
             await Clients.All.SendAsync("GetLatestReading", json);
         }

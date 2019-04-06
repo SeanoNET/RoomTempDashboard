@@ -67,8 +67,7 @@
             stopPing();
 
         totalRunningPings++;
-        currentRate = rate;
-        ping = setInterval(getData, rate, currentRate);
+        ping = setInterval(getData, rate, rate);
     }
 
     function stopPing() {

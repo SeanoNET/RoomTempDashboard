@@ -26,7 +26,12 @@
         data: {
             datasets: [{
                 borderColor: 'Blue',
-                label: 'Room',
+                label: 'Temperature °C',
+                fill: false,
+                data: []
+            }, {
+                borderColor: 'Red',
+                label: 'Humidity',
                 fill: false,
                 data: []
             }]
@@ -48,6 +53,8 @@
                 xAxes: [{
                     type: 'realtime',
                     realtime: {
+                        duration: 30000,
+                        ttl: 120000,
                         delay: 2000
                     }
                 }],
@@ -55,7 +62,7 @@
                     display: true,
                     scaleLabel: {
                         display: true,
-                        labelString: 'Temperature °C'
+                        labelString: ''
                     }
                 }]
             },
@@ -93,17 +100,24 @@
         var MeasuredAt_EPOCH = convertUTCDateToLocalDate(new Date(data.MeasuredAt));
         MeasuredAt_EPOCH = MeasuredAt_EPOCH.getTime();
 
+        // Load temp data
         chart.data.datasets[0].data.push({
             //x: MeasuredAt_EPOCH,
             x: Date.now(),
             y: data.Temperature
         });
 
+        // Load humidity data
+        chart.data.datasets[1].data.push({
+            //x: MeasuredAt_EPOCH,
+            x: Date.now(),
+            y: data.Humidity
+        });
+
         chart.update({
             preservation: true
         });
 
-        document.getElementById("json").innerText = JSON.stringify(data);
     });
 
 
@@ -123,23 +137,51 @@
     $(document).ready(function () {
         // Start SignalR connection
         connection.start().then(function () {
-             createOrChangePing();
+            // Fix for selected delay
+            getData(0);
+            // Default refresh rate
+            chart.options.scales.xAxes[0].realtime.delay = 5000;
+            createOrChangePing(5000);
         }).catch((err) => { return console.error(err); });
 
     });
 
+    $('#refreshRate').on('change', function (event) {
+        var rate = $(this).children("option:selected").val();
+
+        // Change chart delay
+        chart.options.scales.xAxes[0].realtime.delay = parseInt(rate);
+        chart.update();
+
+        if (connection.state === 1) {
+            // Fix for selected delay
+            getData(0);
+            createOrChangePing(rate);
+        } else {
+            // Show disconnected status
+        }
+    });
 
     var ping = null;
+    var totalRunningPings = 0;
 
     // Restarts or starts get data refresh
-    function createOrChangePing() {
-        var currentRate = 1000;
-        getData(currentRate);
-        ping = setInterval(getData, currentRate, currentRate);
+    function createOrChangePing(rate) {
+        if (totalRunningPings != 0)
+            stopPing();
+
+        totalRunningPings++;
+        ping = setInterval(getData, rate, rate);
+    }
+
+    function stopPing() {
+        clearInterval(ping);
+        totalRunningPings--;
+        console.log("Stopped ping");
     }
 
     function getData(currentRate) {
-        console.log(`Call GetLatestReading every ${currentRate}ms`);
+        console.log(`Call GetLatestReading every ${currentRate}ms - total running: ${totalRunningPings}`);
         connection.invoke("GetLatestReading").catch((err) => { console.error(err); });
     }
 
