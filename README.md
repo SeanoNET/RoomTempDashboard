@@ -7,7 +7,11 @@ Web dashboard for displaying temperature and humidity data from [RoomTempDevice-
 ### Timeline
 ![](Docs/timeline.gif)
 
-## Workflow
+## Azure services
+- <img src="Docs/icons/AzureAppService.png" width="25"> [App Service](https://azure.microsoft.com/en-au/services/app-service/)
+- <img src="Docs/icons/AzureSQLDatabase.png" width="25"> [SQL Database](https://azure.microsoft.com/en-au/services/sql-database/)
+- <img src="Docs/icons/AzureStreamAnalytics.png" width="25"> [Azure Stream Analytics](https://azure.microsoft.com/en-au/services/stream-analytics/)
+- <img src="Docs/icons/AzureIoTHub.png" width="25"> [Azure IoT Hub](https://azure.microsoft.com/en-au/services/iot-hub/)
 
 ![](Docs/RoomTempDashboard.png)
 
@@ -71,3 +75,6 @@ CREATE TABLE [dbo].[SensorData](
 ) ON [PRIMARY]
 GO
 ```
+
+## Icons
+[Microsoft Azure, Cloud and Enterprise Symbol / Icon Set](https://www.microsoft.com/en-au/download/details.aspx?id=41937)
