@@ -53,18 +53,19 @@ namespace RoomTempDashboard
                 app.UseHsts();
             }
 
+            app.UseRouting();
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
-            app.UseSignalR(routes => {
-                routes.MapHub<DataHub>("/dataHub");
-            });
 
-            app.UseMvc(routes =>
+            app.UseEndpoints(endpoints =>
             {
-                routes.MapRoute(
+                endpoints.MapHub<DataHub>("/dataHub");
+
+                endpoints.MapControllerRoute(
                     name: "default",
-                    template: "{controller=Home}/{action=Dashboard}/{id?}");
+                    pattern: "{controller=Home}/{action=Dashboard}/{id?}");
+                endpoints.MapRazorPages();
             });
         }
     }
