@@ -12,6 +12,8 @@ using Microsoft.Extensions.DependencyInjection;
 using RoomTempDashboard.Hubs;
 using Microsoft.EntityFrameworkCore;
 using RoomTempDashboard.Models;
+using Hangfire;
+using Hangfire.SqlServer;
 
 namespace RoomTempDashboard
 {
@@ -38,10 +40,29 @@ namespace RoomTempDashboard
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddSignalR();
             services.AddDbContext<HelloIotdbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("HelloIotDatabase")));
+
+            // Hangfire
+            services.AddHangfire(configuration => configuration
+               .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+               .UseSimpleAssemblyNameTypeSerializer()
+               .UseRecommendedSerializerSettings()
+               .UseSqlServerStorage(Configuration.GetConnectionString("HelloIotDatabase"), new SqlServerStorageOptions
+               {
+                   CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
+                   SlidingInvisibilityTimeout = TimeSpan.FromMinutes(5),
+                   QueuePollInterval = TimeSpan.Zero,
+                   UseRecommendedIsolationLevel = true,
+                   UsePageLocksOnDequeue = true,
+                   DisableGlobalLocks = true
+               }));
+
+            // Add the processing server as IHostedService
+            services.AddHangfireServer();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IBackgroundJobClient backgroundJobs, IHostingEnvironment env)
         {
             if (env.IsDevelopment())
             {
@@ -56,7 +77,8 @@ namespace RoomTempDashboard
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
-            app.UseSignalR(routes => {
+            app.UseSignalR(routes =>
+            {
                 routes.MapHub<DataHub>("/dataHub");
             });
 
@@ -66,6 +88,10 @@ namespace RoomTempDashboard
                     name: "default",
                     template: "{controller=Home}/{action=Dashboard}/{id?}");
             });
+
+            // Hangfire
+            app.UseHangfireDashboard();
+            backgroundJobs.Enqueue(() => Console.WriteLine("Hello world from Hangfire!"));
         }
     }
 }
