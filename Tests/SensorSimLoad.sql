@@ -3,7 +3,7 @@ DECLARE @MIN_TEMP INT
 DECLARE @MAX_HUMID INT 
 DECLARE @MIN_HUMID INT 
 
---A script to simulate sensor data when dasboard developing 
+--A script to simulate sensor data when developing the dashboard
 SET @MAX_TEMP = 30--Max random temp 
 SET @MIN_TEMP = 26--Min random temp 
 SET @MAX_HUMID = 48 --Max random humidity 
