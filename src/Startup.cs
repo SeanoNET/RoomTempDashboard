@@ -38,7 +38,7 @@ namespace RoomTempDashboard
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
             services.AddSignalR();
-            services.AddDbContext<HelloIotdbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("HelloIotDatabase")));
+            services.AddDbContext<HelloIotdbContext>(options => options.UseSqlServer(Configuration.GetSection("DataSource").Value));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

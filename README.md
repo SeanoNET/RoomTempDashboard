@@ -1,5 +1,5 @@
 # RoomTempDashboard
-Web dashboard for displaying temperature and humidity data from [RoomTempDevice-IoT](https://github.com/SeanoNET/RoomTempDevice-IoT)
+Web dashboard for displaying temperature and humidity data from [RoomTempDevice-IoT](https://github.com/SeanoNET/RoomTempDevice-IoT) or local stack [RoomTempMQTTConsumer](https://github.com/SeanoNET/RoomTempMQTTConsumer)
 
 ### Dashboard
 ![](Docs/dashboard.gif)
@@ -17,20 +17,44 @@ Web dashboard for displaying temperature and humidity data from [RoomTempDevice-
 
 ## Getting Started
 
-Install [.NET Core](https://dotnet.microsoft.com/download) version 2.2 or above
+Install [.NET Core](https://dotnet.microsoft.com/download) version 3.1 or above
 
 - `git clone https://github.com/SeanoNET/RoomTempDashboard.git`
-- `cd RoomTempDashboard/RoomTempDashboard`
+- `cd RoomTempDashboard/src`
 - `dotnet restore && dotnet run`
 
 ### Config
-Add `HelloIotDatabase` connection string to your `appsettings.json` see [Creating the SQL Database](#Creating-the-SQL-Database)
+Add `DataSource` connection string to your `appsettings.json` see [Creating the SQL Database](#Creating-the-SQL-Database)
+
+> If running the local version of the [RoomTempMQTTConsumer](https://github.com/SeanoNET/RoomTempMQTTConsumer) you do not need to create the database and tables manually.
 
 ```JSON
-"ConnectionStrings": {
-    "HelloIotDatabase": "<ConnectionString>"
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Warning",
+      "Hangfire": "Information"
+    }
+  },
+  "AllowedHosts": "*",
+  "DataSource": "<ConnectionString>"
 }
 ```
+
+## Running locally in Docker
+
+### Building the image
+
+Build the image with
+
+`docker build -t roomtempdashboard:latest .`
+
+### Running in Docker
+
+`docker container run -p 80:80 -e DataSource="<ConnectionString>" --name roomtempdash roomtempdashboard:latest`
+
+see for [RoomTempMQTTConsumer](https://github.com/SeanoNET/RoomTempMQTTConsumer) running the stack locally.
+
 ## Configuring the MXChip and IoT Hub
 
 For configuring the MXChip/IoT Hub and for uploading device code see [RoomTempDevice-IoT Getting Started](https://github.com/SeanoNET/RoomTempDevice-IoT#getting-started)
@@ -59,6 +83,8 @@ FROM
 ```
 
 ## Creating the SQL Database <a name="Creating-the-SQL-Database"></a>
+
+> If running the local version of the [RoomTempMQTTConsumer](https://github.com/SeanoNET/RoomTempMQTTConsumer) you do not need to create the database and tables manually.
 
 Create a table called `SensorData` - The output from the [Stream Analytics Job](#Creating-the-Stream-Analytics-job)
 
