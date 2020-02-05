@@ -20,6 +20,6 @@ jobs:
       env:
         USERNAME: ${{ secrets.DOCKER_USERNAME }}
         PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-        IMAGE_NAME: "seanonet/RoomTempDashboard"
+        IMAGE_NAME: "seanonet/roomtempdashboard"
         TAG_NAME: "$RELEASE_VERSION"
         LATEST: "true"
