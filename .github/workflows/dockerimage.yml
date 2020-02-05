@@ -1,0 +1,25 @@
+name: Docker Image CI
+
+on:
+  push:
+    tags:
+    - '*'
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set env
+      run: echo ::set-env name=RELEASE_VERSION::${GITHUB_REF:10}
+    - name: Build & Push to Docker Hub
+      uses: opspresso/action-docker@master
+      env:
+        USERNAME: ${{ secrets.DOCKER_USERNAME }}
+        PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        IMAGE_NAME: "seanonet/RoomTempDashboard"
+        TAG_NAME: "$RELEASE_VERSION"
+        LATEST: "true"
