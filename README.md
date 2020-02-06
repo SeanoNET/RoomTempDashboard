@@ -75,7 +75,7 @@ The [Stream Analytics](https://docs.microsoft.com/en-us/azure/stream-analytics/s
 SELECT 
     CAST(TEMPERATURE AS float) AS Temperature,
     CAST(HUMIDITY AS float) AS Humidity,
-    CAST(EVENTPROCESSEDUTCTIME AS datetime) as Measured_At
+    CAST(EVENTPROCESSEDUTCTIME AS datetime) as MeasuredAt
 INTO
     optSensorData
 FROM
@@ -93,7 +93,7 @@ CREATE TABLE [dbo].[SensorData](
 	[ID] [int] IDENTITY(1,1) NOT NULL,
 	[Temperature] [decimal](18, 13) NULL,
 	[Humidity] [decimal](18, 13) NULL,
-	[Measured_At] [datetime] NULL,
+	[MeasuredAt] [datetime] NULL,
  CONSTRAINT [PK_SensorData] PRIMARY KEY CLUSTERED 
 (
 	[ID] ASC

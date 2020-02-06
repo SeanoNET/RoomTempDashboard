@@ -4,13 +4,13 @@ using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace RoomTempDashboard.Models
 {
-    public partial class HelloIotdbContext : DbContext
+    public partial class ApplicationDbContext : DbContext
     {
-        public HelloIotdbContext()
+        public ApplicationDbContext()
         {
         }
 
-        public HelloIotdbContext(DbContextOptions<HelloIotdbContext> options)
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
         }
@@ -26,7 +26,7 @@ namespace RoomTempDashboard.Models
                 entity.Property(e => e.Humidity).HasColumnType("decimal(18, 13)");
 
                 entity.Property(e => e.MeasuredAt)
-                    .HasColumnName("Measured_At")
+                    .HasColumnName("MeasuredAt")
                     .HasColumnType("datetime");
 
                 entity.Property(e => e.Temperature).HasColumnType("decimal(18, 13)");

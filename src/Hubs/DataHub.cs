@@ -10,9 +10,9 @@ namespace RoomTempDashboard.Hubs
 {
     public class DataHub : Hub
     {
-        private readonly HelloIotdbContext _context;
+        private readonly ApplicationDbContext _context;
 
-        public DataHub(HelloIotdbContext context)
+        public DataHub(ApplicationDbContext context)
         {
             _context = context;
         }

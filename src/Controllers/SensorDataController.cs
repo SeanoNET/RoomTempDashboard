@@ -11,9 +11,9 @@ namespace RoomTempDashboard.Controllers
 {
     public class SensorDataController : Controller
     {
-        private readonly HelloIotdbContext _context;
+        private readonly ApplicationDbContext _context;
 
-        public SensorDataController(HelloIotdbContext context)
+        public SensorDataController(ApplicationDbContext context)
         {
             _context = context;
         }
