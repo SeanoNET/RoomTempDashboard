@@ -43,6 +43,8 @@ Add `DataSource` connection string to your `appsettings.json` see [Creating the 
 
 ## Running locally in Docker
 
+Install [Docker](https://docs.docker.com/get-docker/)
+
 ### Building the image
 
 Build the image with
