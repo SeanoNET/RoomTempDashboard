@@ -1,4 +1,6 @@
 # RoomTempDashboard
+![Build Docker CLI](https://github.com/SeanoNET/RoomTempDashboard/workflows/Build%20Docker%20CLI/badge.svg)
+
 Web dashboard for displaying temperature and humidity data from [RoomTempDevice-IoT](https://github.com/SeanoNET/RoomTempDevice-IoT) or local stack [RoomTempMQTTConsumer](https://github.com/SeanoNET/RoomTempMQTTConsumer)
 
 ### Dashboard
