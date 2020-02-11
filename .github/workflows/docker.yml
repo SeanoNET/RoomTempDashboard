@@ -1,4 +1,4 @@
-name: build
+name: Build Docker CLI
 
 on:
   pull_request:
@@ -17,7 +17,7 @@ on:
       - 'src/**'
 
 jobs:
-  build:
+  build2:
     runs-on: ubuntu-latest    
     steps:
       - uses: actions/checkout@v1
