@@ -63,7 +63,5 @@ jobs:
         if: success() && startsWith(github.ref, 'refs/tags/v')
         uses: actions-hub/docker@master
         with:
-          args: push "${{ steps.prepare.outputs.docker_image }}:${{ steps.prepare.outputs.version }}"
           args: push "${{ steps.prepare.outputs.docker_image }}:latest"
-          args: push "${{ steps.prepare.outputs.docker_image }}:linux-arm-${{ steps.prepare.outputs.version }}"
-          args: push "${{ steps.prepare.outputs.docker_image }}:linux-arm-latest"
+
