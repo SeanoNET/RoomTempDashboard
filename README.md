@@ -39,7 +39,7 @@ Add `DataSource` connection string to your `appsettings.json` see [Creating the 
     }
   },
   "AllowedHosts": "*",
-  "DataSource": "<ConnectionString>"
+  "DataSource": "Host=localhost;Database=MQTT;Username=postgres;Password=St0ngPassword1!"
 }
 ```
 
