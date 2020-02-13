@@ -99,6 +99,11 @@ volumes:
 ```
 run `docker-compose up --build`.
 
+
+## Running Stack in Production on Swarm
+
+For running in production see [RoomTempStack](https://github.com/SeanoNET/RoomTempStack)
+
 ## Cloud Stack
 - <img src="Docs/icons/AzureAppService.png" width="25"> [App Service](https://azure.microsoft.com/en-au/services/app-service/)
 - <img src="Docs/icons/AzureSQLDatabase.png" width="25"> [SQL Database](https://azure.microsoft.com/en-au/services/sql-database/)
