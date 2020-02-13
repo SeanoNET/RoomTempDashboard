@@ -50,9 +50,54 @@ Run the image:
 
 `docker container run -p 5000:5000 -e DataSource="Host=localhost;Database=MQTT;Username=postgres;Password=St0ngPassword1!" -e "ASPNETCORE_URLS: http://0.0.0.0:5000" --name roomtempdash roomtempdashboard:dev`
 
-You can start the other services with the `docker-compose.yml` file in [RoomTempMQTTConsumer](https://github.com/SeanoNET/RoomTempMQTTConsumer/blob/master/docker-compose.yml)
+Install [Docker Compose](https://docs.docker.com/compose/install/) and start the other services with the `docker-compose.yml`.
 
-`docker-compose up`
+```
+version: '3'
+
+services:
+
+  consumer:
+    image: seanonet/roomtempmqttconsumer:latest
+    environment:
+      DataSource: Host=dbdata;Database=MQTT;Username=postgres;Password=St0ngPassword1!;
+      ClientId: metric-consumer
+      MqttServerIp: mqtt
+      MqttServerPort: 1883
+      MqttSubscribeTopic: home/room/temp-mon/data
+    depends_on:
+        - mqtt
+        - dbdata
+  mqtt:
+    image: eclipse-mosquitto:1.6
+    ports:
+        - 1883:1883
+        - 9001:9001
+    volumes:
+        - mosquitto:/mosquitto/data
+        - mosquitto:/mosquitto/log eclipse-mosquitto
+  dbdata:
+    image: postgres:12
+    ports:
+    - 5432:5432
+    environment:
+        POSTGRES_PASSWORD: St0ngPassword1!
+    volumes:
+        - dbsql:/var/lib/postgresql/data
+  dashboard:
+    build: .
+    image: roomtempdashboard:dev
+    ports:
+        - 5000:5000
+    environment:
+        DataSource: Server=dbdata;Database=MQTT;User Id=sa;Password=St0ngPassword1!;
+        ASPNETCORE_URLS: http://0.0.0.0:5000
+
+volumes:
+    mosquitto:
+    dbsql:
+```
+run `docker-compose up --build`.
 
 ## Cloud Stack
 - <img src="Docs/icons/AzureAppService.png" width="25"> [App Service](https://azure.microsoft.com/en-au/services/app-service/)
