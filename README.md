@@ -21,7 +21,7 @@ See [RoomTempMQTTConsumer](https://github.com/SeanoNET/RoomTempMQTTConsumer) for
 
 ### Config
 
-Configure the [Postgres](https://www.postgresql.org/) `DataSource` connection string to your `appsettings.json`
+Configure the [Postgres](https://www.postgresql.org/) `DataSource` connection string in `appsettings.json`
 
 > Setup and start the [RoomTempMQTTConsumer](https://github.com/SeanoNET/RoomTempMQTTConsumer) first, it will generate the database and tables for you.
 
@@ -68,7 +68,7 @@ Install the [Microsoft.EntityFrameworkCore.SqlServer NuGet package.](https://www
 
 `dotnet add package Microsoft.EntityFrameworkCore.SqlServer --version 3.1.1`
 
-Replace `options.UseNpgsql()` with `UseSqlServer()` in `ConfigureServices`.  
+Replace `options.UseNpgsql()` with `options.UseSqlServer()` in `ConfigureServices`.  
 
 `Startup.cs`
 
@@ -92,7 +92,9 @@ public void ConfigureServices(IServiceCollection services)
 
 ### Config
 
-Configure the [MSSQL](https://www.microsoft.com/en-us/sql-server/sql-server-2019) `DataSource` connection string to your `appsettings.json` see [Creating the SQL Database](#Creating-the-SQL-Database)
+Configure the [MSSQL](https://www.microsoft.com/en-us/sql-server/sql-server-2019) `DataSource` connection string in `appsettings.json`.
+
+> You will need to manually create the table and database see [Creating the SQL Database](#Creating-the-SQL-Database)
 
 ```JSON
 {
@@ -109,7 +111,7 @@ Configure the [MSSQL](https://www.microsoft.com/en-us/sql-server/sql-server-2019
 
 ## Configuring the MXChip and IoT Hub
 
-For configuring the MXChip/IoT Hub and for uploading device code see [RoomTempDevice-IoT Getting Started](https://github.com/SeanoNET/RoomTempDevice-IoT#getting-started)
+For configuring the MXChip/IoT Hub and for uploading device code refer to [RoomTempDevice-IoT Getting Started](https://github.com/SeanoNET/RoomTempDevice-IoT#getting-started)
 
 ## Stream Analytics
 
