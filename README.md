@@ -3,19 +3,9 @@
 
 Web dashboard for displaying temperature and humidity data from [RoomTempDevice-IoT](https://github.com/SeanoNET/RoomTempDevice-IoT) or local stack [RoomTempMQTTConsumer](https://github.com/SeanoNET/RoomTempMQTTConsumer)
 
-### Dashboard
 ![](Docs/dashboard.gif)
 
-### Timeline
 ![](Docs/timeline.gif)
-
-## Azure services
-- <img src="Docs/icons/AzureAppService.png" width="25"> [App Service](https://azure.microsoft.com/en-au/services/app-service/)
-- <img src="Docs/icons/AzureSQLDatabase.png" width="25"> [SQL Database](https://azure.microsoft.com/en-au/services/sql-database/)
-- <img src="Docs/icons/AzureStreamAnalytics.png" width="25"> [Azure Stream Analytics](https://azure.microsoft.com/en-au/services/stream-analytics/)
-- <img src="Docs/icons/AzureIoTHub.png" width="25"> [Azure IoT Hub](https://azure.microsoft.com/en-au/services/iot-hub/)
-
-![](Docs/RoomTempDashboard.png)
 
 ## Getting Started
 
@@ -25,10 +15,15 @@ Install [.NET Core](https://dotnet.microsoft.com/download) version 3.1 or above
 - `cd RoomTempDashboard/src`
 - `dotnet restore && dotnet run`
 
-### Config
-Add `DataSource` connection string to your `appsettings.json` see [Creating the SQL Database](#Creating-the-SQL-Database)
+## Local Stack
 
-> If running the local version of the [RoomTempMQTTConsumer](https://github.com/SeanoNET/RoomTempMQTTConsumer) you do not need to create the database and tables manually.
+See [RoomTempMQTTConsumer](https://github.com/SeanoNET/RoomTempMQTTConsumer) for running the MQTT consumer - this replaces all the cloud services with local alternatives. The local version uses postgres as the db engine due to mssql not supported being supported on arm processors yet. Using postgres will allow you to run this stack on a Raspberry Pi or other arm32 devices.
+
+### Config
+
+Configure the [Postgres](https://www.postgresql.org/) `DataSource` connection string to your `appsettings.json`
+
+> Setup and start the [RoomTempMQTTConsumer](https://github.com/SeanoNET/RoomTempMQTTConsumer) first, it will generate the database and tables for you.
 
 ```JSON
 {
@@ -43,21 +38,74 @@ Add `DataSource` connection string to your `appsettings.json` see [Creating the 
 }
 ```
 
-## Running locally in Docker
+### Running locally in Docker
 
 Install [Docker](https://docs.docker.com/get-docker/)
 
-### Building the image
+Build the image:
 
-Build the image with
+`docker build -t roomtempdashboard:dev .`
 
-`docker build -t roomtempdashboard:latest .`
+Run the image:
 
-### Running in Docker
+`docker container run -p 5000:5000 -e DataSource="Host=localhost;Database=MQTT;Username=postgres;Password=St0ngPassword1!" -e "ASPNETCORE_URLS: http://0.0.0.0:5000" --name roomtempdash roomtempdashboard:dev`
 
-`docker container run -p 80:80 -e DataSource="<ConnectionString>" --name roomtempdash roomtempdashboard:latest`
+You can start the other services with the `docker-compose.yml` file in [RoomTempMQTTConsumer](https://github.com/SeanoNET/RoomTempMQTTConsumer/blob/master/docker-compose.yml)
 
-see for [RoomTempMQTTConsumer](https://github.com/SeanoNET/RoomTempMQTTConsumer) running the stack locally.
+`docker-compose up`
+
+## Cloud Stack
+- <img src="Docs/icons/AzureAppService.png" width="25"> [App Service](https://azure.microsoft.com/en-au/services/app-service/)
+- <img src="Docs/icons/AzureSQLDatabase.png" width="25"> [SQL Database](https://azure.microsoft.com/en-au/services/sql-database/)
+- <img src="Docs/icons/AzureStreamAnalytics.png" width="25"> [Azure Stream Analytics](https://azure.microsoft.com/en-au/services/stream-analytics/)
+- <img src="Docs/icons/AzureIoTHub.png" width="25"> [Azure IoT Hub](https://azure.microsoft.com/en-au/services/iot-hub/)
+
+![](Docs/RoomTempDashboard.png)
+
+## Setup MSSQL Entity Framework Provider
+
+Install the [Microsoft.EntityFrameworkCore.SqlServer NuGet package.](https://www.nuget.org/packages/Microsoft.EntityFrameworkCore.SqlServer/)
+
+`dotnet add package Microsoft.EntityFrameworkCore.SqlServer --version 3.1.1`
+
+Replace `options.UseNpgsql()` with `UseSqlServer()` in `ConfigureServices`.  
+
+`Startup.cs`
+
+```
+// This method gets called by the runtime. Use this method to add services to the container.
+public void ConfigureServices(IServiceCollection services)
+{
+    services.Configure<CookiePolicyOptions>(options =>
+    {
+        // This lambda determines whether user consent for non-essential cookies is needed for a given request.
+        options.CheckConsentNeeded = context => true;
+        options.MinimumSameSitePolicy = SameSiteMode.None;
+    });
+
+
+    services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
+    services.AddSignalR();
+    services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(Configuration.GetSection("DataSource").Value));
+}
+```
+
+### Config
+
+Configure the [MSSQL](https://www.microsoft.com/en-us/sql-server/sql-server-2019) `DataSource` connection string to your `appsettings.json` see [Creating the SQL Database](#Creating-the-SQL-Database)
+
+```JSON
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Warning",
+      "Hangfire": "Information"
+    }
+  },
+  "AllowedHosts": "*",
+  "DataSource": "Server=myServerAddress;Database=myDataBase;User Id=myUsername;Password=myPassword;"
+}
+```
 
 ## Configuring the MXChip and IoT Hub
 
@@ -86,9 +134,7 @@ FROM
     iptSensorData
 ```
 
-## Creating the SQL Database <a name="Creating-the-SQL-Database"></a>
-
-> If running the local version of the [RoomTempMQTTConsumer](https://github.com/SeanoNET/RoomTempMQTTConsumer) you do not need to create the database and tables manually.
+## Creating the SQL Database
 
 Create a table called `SensorData` - The output from the [Stream Analytics Job](#Creating-the-Stream-Analytics-job)
 
